@@ -168,6 +168,8 @@ Program ContableEmpresarialInternacional;
     
     Var{Local de Procedure LecturaConversionArchVentasArg}
       VentasSucMes:real;
+      MesPpal:T_Mes;
+      NroSuc:word;
   
     Begin{Local de Procedure LecturaConversionArchVentasArg}
       if (not FinVentasArg)then
