@@ -81,7 +81,7 @@ Program ContableEmpresarialInternacional;
        VentasSucMes[j]:=0
      End;      
   
-   Function ConversionEntero(VentasSuc[MesPpal]:real):longword;
+   Function ConversionEntero(VentasSucMesPpal:real):longword;
      Const
        Coma=',';
        Inicial=1;
@@ -91,7 +91,7 @@ Program ContableEmpresarialInternacional;
       Cantidad:byte;
       code:byte;
      Begin
-       Str(VentasSuc[MesPpal], StAux);
+       Str(VentasSucMesPpal, StAux);
        Posicion:=Pos(Coma, StAux);
        Cantidad:=Posicion-Inicial;
        StAux:=Copy(StAux, Inicial, Cantidad); 
@@ -154,7 +154,7 @@ Program ContableEmpresarialInternacional;
       
  Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchVentasHistorico:T_ArchVentasHistorico; Var ArchVentasHistoricoActualizado:T_ArchVentasHistorico);
   
-  Procedure LecturaConversionArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasArgH:T_RegVentasHistorico; Var FinVentasArg:boolean; Var RegVentasArg:T_RegVentasArg);
+  Procedure LecturaConversionArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasArgH:T_RegVentasHistorico; Var FinVentasArg:boolean; Var RegVentasArg:T_RegVentasArg; Var Mes:T_Mes);
     
     Procedure ConversionH(Var RegVentasArgH:T_RegVentasHistorico; VentasSucMes:real; MesPpal:T_Mes; NroSuc:word);
        Const
@@ -168,7 +168,6 @@ Program ContableEmpresarialInternacional;
     
     Var{Local de Procedure LecturaConversionArchVentasArg}
       VentasSucMes:real;
-      Mes:T_Mes;
   
     Begin{Local de Procedure LecturaConversionArchVentasArg}
       if (not FinVentasArg)then
@@ -193,6 +192,7 @@ Program ContableEmpresarialInternacional;
      FinVentasArg:boolean;
      FinVentasHistorico:boolean; 
      RegVentasArg:T_RegVentasArg;
+     Mes:T_Mes;
    
   Begin{Local de ProcedureActualizarVentasHistorico}
     Reset(ArchVentasArg);
@@ -202,8 +202,8 @@ Program ContableEmpresarialInternacional;
     FinVentasArg:=(EOF(ArchVentasArg);
     if (not FinVentasArg) then
       begin
-        LecturaArchVentasArg(ArchVentasArch, RegVentasArg, FinVentasArg);
-        LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg)
+        LecturaArchVentasArg(ArchVentasArch, RegVentasArg, FinVentasArg, Mes);
+        LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes)
       end; 
     LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico); 
     
@@ -218,16 +218,16 @@ Program ContableEmpresarialInternacional;
                 if (RegVentasArgH.Importe<>0) then
                     begin
                      Writeln(ArchVentasHistoricoActualizado, RegVentasArgH);
-                     LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg);
+                     LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes);
                     end;
-                  else LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg)
+                  else LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes)
                end;
       end;
     
     while (not FinVentasArg) do
       begin
         Writeln(ArchVentasHistoricoActualizado, RegVentasArgH);
-        LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg)
+        LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes)
       end;
     
     while (not FinVentasHistorico) do
