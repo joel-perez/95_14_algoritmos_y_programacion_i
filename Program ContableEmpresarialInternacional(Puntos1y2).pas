@@ -12,14 +12,14 @@ Program ContableEmpresarialInternacional;
     Importe:real;
    end;
   T_ArchVentasArg=File of T_RegVentasArg;
-  T_RegSucArg=Record
+  T_RegSucursal=Record
     Num_Sucursal:word;
     Nombre:string[30];
     Pais:string[50];
     Direccion:string[50];
     Telefono:string[20];
    end;
-  T_ArchSucArg=File of T_RegSucArg;
+  T_ArchSucursal=File of T_RegSucursal;
   T_RegVentasHistorico=Record
     Anio:string[4];
     Mes:string[2];
@@ -57,17 +57,17 @@ Program ContableEmpresarialInternacional;
  
  
  
- Procedure LecturaArchSucArg(Var ArchSucArg:T_ArchSucArg; Var RegSucArg:T_RegSucArg; Var FinSucArg:boolean);
+ Procedure LecturaArchSucursal(Var ArchSucursal:T_ArchSucursal; Var RegSucursal:T_RegSucursal; Var FinSucursal:boolean);
    Begin
-    FinSucArg:=EOF(ArchSucArg);
-    if (not FinSucArg) then 
-     Read(ArchSucArg, RegSucArg)
+    FinSucursal:=EOF(ArchSucursal);
+    if (not FinSucursal) then 
+     Read(ArchSucursal, RegSucursal)
    End;    
    
  
  
    
- Procedure CuadroVentasArg2015(Var ArchVentasArg:T_ArchVentasArg; Var ArchSucArg:T_ArchSucArg);
+ Procedure CuadroVentasArg2015(Var ArchVentasArg:T_ArchVentasArg; Var ArchSucArg:T_ArchSucursal);
 
    Type{Local del ProcedureCuadroVentasArg2015}
     T_Mes0=0..12;
@@ -100,7 +100,7 @@ Program ContableEmpresarialInternacional;
     
    Var{Locales del Procedure CuadroVentasArg2015}
      RegVentasArg:T_RegVentasArg;
-     RegSucArg:T_RegSucArg;
+     RegSucArg:T_RegSucursal;
      FinVentasArg:boolean;
      FinSucArg:boolean;
      Mes:T_Mes;
@@ -117,7 +117,7 @@ Program ContableEmpresarialInternacional;
      writeln('----------------------------------------------------------------------------------------------------------------------------------');
    
      LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg, Mes);
-     LecturaArchSucArg(ArchSucArg, RegSucArg, FinSucArg);
+     LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);
   
      StSpace:='  $'
    
@@ -136,14 +136,14 @@ Program ContableEmpresarialInternacional;
              VentaSucMes[MesPpal]:=ConversionEntero(VentasSucMes[MesPpal]); 
            end;  
          writeln(RegSucArg.Nombre, StSpace, VentasSucMes[1], StSpace, VentasSucMes[2], StSpace, VentasSucMes[3], StSpace, VentasSucMes[4], StSpace, VentasSucMes[5], StSpace, VentasSucMes[6], StSpace, VentasSucMes[7], StSpace, VentasSucMes[8], StSpace, VentasSucMes[9], StSpace, VentasSucMes[10], StSpace, VentasSucMes[11], StSpace, VentasSucMes[12]);        
-         LecturaArchSucArg(ArchSucArg, RegSucArg, FinSucArg);   
+         LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);   
        end;
    
      while (not FinSucArg) do
        begin
          InicializarVentasSucMes(VentasSucMes);
          writeln(RegSucArg.Nombre, StSpace, VentasSucMes[1], StSpace, VentasSucMes[2], StSpace, VentasSucMes[3], StSpace, VentasSucMes[4], StSpace, VentasSucMes[5], StSpace, VentasSucMes[6], StSpace, VentasSucMes[7], StSpace, VentasSucMes[8], StSpace, VentasSucMes[9], StSpace, VentasSucMes[10], StSpace, VentasSucMes[11], StSpace, VentasSucMes[12]);        
-         LecturaArchSucArg(ArchSucArg, RegSucArg, FinSucArg);   
+         LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);   
        end; 
    
      Close(ArchVentasArg);
@@ -247,7 +247,7 @@ Program ContableEmpresarialInternacional;
  
  Var {BloqPpalProgram}
    ArchVentasArg:T_ArchVentasArg;
-   ArchSucArg:T_ArchSucArg;
+   ArchSucArg:T_ArchSucursal;
    ArchVentasHistorico:T_ArchVentasHistorico;
    ArchVentasHistoricoActualizado:T_ArchVentasHistorico;
    
