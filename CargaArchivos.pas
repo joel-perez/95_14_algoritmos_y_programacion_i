@@ -262,11 +262,11 @@ begin
 end; 
 
 BEGIN {Programa Principal}
-	Assign(Ventas2015,'C:\Ventas.dat');
-	Assign(VentasHistorico,'C:\VentasHistorico.dat'); 
-	Assign(SucNuevas,'C:\SucursalesArg.dat');
-	Assign(SucMundo,'C:\SucursalesMundo.dat');
-	Assign(Clientes,'C:\Clientes.dat');
+	Assign(Ventas2015,'Ventas.dat');
+	Assign(VentasHistorico,'VentasHistorico.dat'); 
+	Assign(SucNuevas,'SucursalesArg.dat');
+	Assign(SucMundo,'SucursalesMundo.dat');
+	Assign(Clientes,'Clientes.dat');
 	Writeln('Bienvenido al programa de carga de carga de archivos');
 	continua:=true;
 	While continua do
