@@ -105,7 +105,7 @@ Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchV
      while (not FinVentasHistorico) do
        begin
         Writeln(ArchVentasHistoricoActualizado, RegVentasHistorico);
-        LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico)
+        LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
        end;    
        
      Close(ArchVentasArg);
