@@ -36,7 +36,7 @@ Program ContableEmpresarialInternacional;
     Begin{Local de Procedure LecturaArchVentasArg}
        FinVentasArg:=EOF(ArchVentasArg);
        if (not FinVentasArg) then
-         Read(ArchVentasArg, RegVentasArg)
+         Read(ArchVentasArg, RegVentasArg);
     End; {Local de Procedure LecturaArchVentasArg}  
     
     
@@ -57,7 +57,7 @@ Program ContableEmpresarialInternacional;
    Begin
     FinSucursal:=EOF(ArchSucursal);
     if (not FinSucursal) then 
-     Read(ArchSucursal, RegSucursal)
+     Read(ArchSucursal, RegSucursal);
    End;    
    
  
@@ -74,7 +74,7 @@ Program ContableEmpresarialInternacional;
        j:T_Mes;
      Begin
        for j:=1 to 12 do
-       VentasSucMes[j]:=0
+       VentasSucMes[j]:=0;
      End;      
      
    Var{Locales del Procedure CuadroVentasArg2015}
