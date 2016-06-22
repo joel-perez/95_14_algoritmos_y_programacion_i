@@ -68,6 +68,7 @@ Program ContableEmpresarialInternacional;
  Procedure CuadroVentasArg2015(Var ArchVentasArg:T_ArchVentasArg; Var ArchSucArg:T_ArchSucursal);
 
    Type{Local del ProcedureCuadroVentasArg2015}
+    T_Mes0=0..12;
     T_VecVentasSucMes=Array [T_Mes] of real;
      
    Procedure InicializarVentasSucMes(Var VentasSucMes:T_VecVentasSucMes);
@@ -84,7 +85,7 @@ Program ContableEmpresarialInternacional;
      FinVentasArg:boolean;
      FinSucArg:boolean;
      Mes:T_Mes;
-     MesPpal:T_Mes;
+     MesPpal:T_Mes0;
      VentasSucMes:T_VecVentasSucMes;
      StSpace:string[3];
     
@@ -104,7 +105,7 @@ Program ContableEmpresarialInternacional;
    
      while (not FinVentasArg) and (not FinSucArg) do
        begin
-         MesPpal:=Mes;
+         MesPpal:=0;
          InicializarVentasSucMes(VentasSucMes);
          while (not FinVentasArg) and (not FinSucArg) and (RegVentasArg.Sucursal=RegSucArg.Num_Sucursal) do
            begin
