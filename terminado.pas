@@ -128,7 +128,6 @@ Program ContableEmpresarialInternacional;
      RegSucArg:T_RegSucursal;
      FinVentasArg:boolean;
      FinSucArg:boolean;
-     Mes:T_Mes;
      MesPpal:T_Mes0;
      VentasSucMes:T_VecVentasSucMes;
      StSpace:string[3];
@@ -177,96 +176,120 @@ Program ContableEmpresarialInternacional;
   
   
       
- Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchVentasHistorico:T_ArchVentasHistorico; Var ArchVentasHistoricoActualizado:T_ArchVentasHistorico);
+Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchVentasHistorico:T_ArchVentasHistorico; Var ArchVentasHistoricoActualizado:T_ArchVentasHistorico);
   
-  Procedure LecturaConversionArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasArgH:T_RegVentasHistorico; Var FinVentasArg:boolean; Var RegVentasArg:T_RegVentasArg; Var Mes:T_Mes);
-    
-    Procedure ConversionH(Var RegVentasArgH:T_RegVentasHistorico; VentasSucMes:real; MesPpal:T_Mes; NroSuc:word);
+  Procedure ConversionH(Var RegVentasArgH:T_RegVentasHistorico; MesPpal:T_Mes; NroSuc:word; VentasMes:real);
        Const
          Anio='2015';
        Begin
          RegVentasArgH.Anio:=Anio;
          Str(MesPpal, RegVentasArgH.Mes);
          RegVentasArgH.Num_Sucursal:=NroSuc;
-         RegVentasArgH.Importe:=VentasSucMes
-       End;
-    
-    Var{Local de Procedure LecturaConversionArchVentasArg}
-      VentasSucMes:real;
-      MesPpal:T_Mes;
-      NroSuc:word;
+         RegVentasArgH.Importe:=VentasMes;
+       End;  
   
-    Begin{Local de Procedure LecturaConversionArchVentasArg}
-      if (not FinVentasArg)then
-         begin   
-           NroSuc:=RegVentasArg.Sucursal;
-           MesPpal:=Mes;
-           VentasSucMes:=0;
-           while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
-             begin
-               VentasSucMes:=VentasSucMes+RegVentasArg.Importe;
-               LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg)
-             end;  
-           ConversionH(RegVentasArgH, VentasSucMes, MesPpal, NroSuc)
-         end;     
-    End; {Local de Procedure LecturaConversionArchVentasArg}  
-  
-  
-  
-  Var{Local de ProcedureActualizarVentasHistorico}
+  Var{Procedure ActualizarVentasHistorico}
      RegVentasArgH:T_RegVentasHistorico;
      RegVentasHistorico:T_RegVentasHistorico;
      FinVentasArg:boolean;
      FinVentasHistorico:boolean; 
      RegVentasArg:T_RegVentasArg;
      Mes:T_Mes;
+     MesPpal:T_Mes;
+     NroSuc:word;
+     VentasMes:real;
      
   Begin{Local de ProcedureActualizarVentasHistorico}
-    Reset(ArchVentasArg);
-    Reset(ArchVentasHistorico);
-    Rewrite(ArchVentasHistoricoActualizado);
-    
-    FinVentasArg:=EOF(ArchVentasArg);
-    if (not FinVentasArg) then
-      begin
-        LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
-        LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes)
-      end; 
-    LecturaArchVentasHst(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico); 
-    
-    while (not FinVentasArg) and (not FinVentasHistorico) do
-        if (RegVentasHistorico.Num_Sucursal<=RegVentasArgH.Num_Sucursal) then
-            begin
-              Write(ArchVentasHistoricoActualizado, RegVentasHistorico);
-              LecturaArchVentasHst(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico)
-            end
-        else
+   
+   Reset(ArchVentasArg);
+   Reset(ArchVentasHistorico);
+   Rewrite(ArchVentasHistoricoActualizado);
+   
+   LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+   if (not FinVentasArg) then
+     begin
+       Mes:=ConseguirMes(RegVentasArg);
+       MesPpal:=Mes;
+       NroSuc:=RegVentasArg.Sucursal;
+       VentasMes:=0;
+       while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+         begin
+           VentasMes:=VentasMes+RegVentasArg.Importe;
+           LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+           Mes:=ConseguirMes(RegVentasArg);
+         end;
+       ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+     end; 
+   LecturaArchVentasHst(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico); 
+   
+   while (not FinVentasArg) and (not FinVentasHistorico) do
+       if (RegVentasHistorico.Num_Sucursal<=RegVentasArgH.Num_Sucursal) then
+           begin
+             Write(ArchVentasHistoricoActualizado, RegVentasHistorico);
+             LecturaArchVentasHst(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
+           end
+        else 
 			begin
                 if (RegVentasArgH.Importe<>0) then
-                    begin
+                   begin
                      Write(ArchVentasHistoricoActualizado, RegVentasArgH);
-                     LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes);
-                    end
-                  else 
-                  LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes);
-            end;
-    
-    while (not FinVentasArg) do
+                     if (not FinVentasArg) then
+                       begin
+                         MesPpal:=Mes;
+                         NroSuc:=RegVentasArg.Sucursal;
+                         VentasMes:=0;
+                         while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+                           begin
+                             VentasMes:=VentasMes+RegVentasArg.Importe;
+                             LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+                            Mes:=ConseguirMes(RegVentasArg);
+                           end;
+                         ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+                       end; 
+                   end
+                 else if (not FinVentasArg) then
+                       begin
+                         MesPpal:=Mes;
+                         NroSuc:=RegVentasArg.Sucursal;
+                         VentasMes:=0;
+                         while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+                           begin
+                             VentasMes:=VentasMes+RegVentasArg.Importe;
+                             LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+                             Mes:=ConseguirMes(RegVentasArg);
+                           end;
+                         ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+                       end; 
+     end; 
+        
+     while (not FinVentasArg) do
       begin
         Write(ArchVentasHistoricoActualizado, RegVentasArgH);
-        LecturaConversionArchVentasArg(ArchVentasArg, RegVentasArgH, FinVentasArg, RegVentasArg, Mes)
-      end;
-    
-    while (not FinVentasHistorico) do
-      begin
+        if (not FinVentasArg) then
+           begin
+              MesPpal:=Mes;
+              NroSuc:=RegVentasArg.Sucursal;
+              VentasMes:=0;
+              while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+                begin
+                  VentasMes:=VentasMes+RegVentasArg.Importe;
+                  LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+                  Mes:=ConseguirMes(RegVentasArg);
+                end;
+              ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+           end; 
+      end;  
+     while (not FinVentasHistorico) do
+       begin
         Write(ArchVentasHistoricoActualizado, RegVentasHistorico);
         LecturaArchVentasHst(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
-      end;
-    
-    Close(ArchVentasArg);
-    Close(ArchVentasHistorico);
-    Close(ArchVentasHistoricoActualizado);  
-  End; {Local de ProcedureActualizarVentasHistorico}
+       end;    
+       
+     Close(ArchVentasArg);
+     Close(ArchVentasHistorico);
+     Close(ArchVentasHistoricoActualizado);
+     
+   End;{Procedure ActualizarVentasHistorico}
   
   procedure TotalizarClientes(var arClientes:tArClientes; var arTotClientes:tArTotClientes);
 	var
