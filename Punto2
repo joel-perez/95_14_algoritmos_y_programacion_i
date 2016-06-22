@@ -1,0 +1,114 @@
+Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchVentasHistorico:T_ArchVentasHistorico; Var ArchVentasHistoricoActualizado:T_ArchVentasHistorico);
+  
+  Procedure ConversionH(Var RegVentasArgH:T_RegVentasHistorico; MesPpal:T_Mes; NroSuc:word; VentasMes:real);
+       Const
+         Anio='2015';
+       Begin
+         RegVentasArgH.Anio:=Anio;
+         Str(MesPpal, RegVentasArgH.Mes);
+         RegVentasArgH.Num_Sucursal:=NroSuc;
+         RegVentasArgH.Importe:=VentasMes;
+       End;  
+  
+  Var{Procedure ActualizarVentasHistorico}
+     RegVentasArgH:T_RegVentasHistorico;
+     RegVentasHistorico:T_RegVentasHistorico;
+     FinVentasArg:boolean;
+     FinVentasHistorico:boolean; 
+     RegVentasArg:T_RegVentasArg;
+     Mes:T_Mes;
+     NroSuc:word;
+     VentasMes:real;
+     
+  Begin{Local de ProcedureActualizarVentasHistorico}
+   
+   Reset(ArchVentasArg);
+   Reset(ArchVentasHistorico);
+   Rewrite(ArchVentasHistoricoActualizado);
+   
+   LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+   if (not FinVentasArg) then
+     begin
+       Mes:=ConseguirMes(RegVentasArg);
+       MesPpal:=Mes;
+       NroSuc:=RegVentasArg.Sucursal;
+       VentasMes:=0;
+       while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+         begin
+           VentasMes:=VentasMes+RegVentasArg.Importe;
+           LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+           Mes:=ConseguirMes(RegVentasArg);
+         end;
+       ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+     end; 
+   LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico); 
+   
+   while (not FinVentasArg) and (not FinVentasHistorico) do
+     begin 
+       if (RegVentasHistorico.Num_Suc<=RegVentasArgH.Num_Suc) then
+           begin
+             Writeln(ArchVentasHistoricoActualizado, RegVentasHistorico);
+             LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
+           end;       
+        else begin
+                if (RegVentasArgH.Importe<>0) then
+                   begin
+                     Writeln(ArchVentasHistoricoActualizado, RegVentasArgH);
+                     if (not FinVentasArg) then
+                       begin
+                         MesPpal:=Mes;
+                         NroSuc:=RegVentasArg.Sucursal;
+                         VentasMes:=0;
+                         while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+                           begin
+                             VentasMes:=VentasMes+RegVentasArg.Importe;
+                             LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+                             Mes:=ConseguirMes(RegVentasArg);
+                           end;
+                         ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+                       end; 
+                   end;
+                 else if (not FinVentasArg) then
+                       begin
+                         MesPpal:=Mes;
+                         NroSuc:=RegVentasArg.Sucursal;
+                         VentasMes:=0;
+                         while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+                           begin
+                             VentasMes:=VentasMes+RegVentasArg.Importe;
+                             LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+                             Mes:=ConseguirMes(RegVentasArg);
+                           end;
+                         ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+                       end; 
+             end;
+     end; 
+        
+     while (not FinVentasArg) do
+      begin
+        Writeln(ArchVentasHistoricoActualizado, RegVentasArgH);
+        if (not FinVentasArg) then
+           begin
+              MesPpal:=Mes;
+              NroSuc:=RegVentasArg.Sucursal;
+              VentasMes:=0;
+              while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
+                begin
+                  VentasMes:=VentasMes+RegVentasArg.Importe;
+                  LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+                  Mes:=ConseguirMes(RegVentasArg);
+                end;
+              ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
+           end; 
+        
+     while (not FinVentasHistorico) do
+       begin
+        Writeln(ArchVentasHistoricoActualizado, RegVentasHistorico);
+        LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico)
+       end;    
+       
+     Close(ArchVentasArg);
+     Close(ArchVentasHistorico);
+     Close(ArchVentasHistoricoActualizado);
+     
+   End;{Procedure ActualizarVentasHistorico}
