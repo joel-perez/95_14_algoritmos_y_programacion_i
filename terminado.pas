@@ -2,6 +2,14 @@ Program ContableEmpresarialInternacional;
  
  Uses Crt,sysutils;
  
+ const
+    maxLargoNombre = 30;
+    maxLargoProvincia = 50;
+    maxLargoLocalidad = 50;
+    maxLargoDireccion = 50;
+    maxLargoPais = 50;
+    maxLargoTelefono = 20;
+    
  Type
   T_RegVentasArg=Record
     Fecha:string[8];
@@ -14,10 +22,10 @@ Program ContableEmpresarialInternacional;
   T_ArchVentasArg=File of T_RegVentasArg;
   T_RegSucursal=Record
     Num_Sucursal:word;
-    Nombre:string[30];
-    Pais:string[50];
-    Direccion:string[50];
-    Telefono:string[20];
+    Nombre:string[maxLargoNombre];
+    Pais:string[maxLargoPais];
+    Direccion:string[maxLargoDireccion];
+    Telefono:string[maxLargoTelefono];
    end;
   T_ArchSucursal=File of T_RegSucursal;
   T_RegVentasHistorico=Record
@@ -27,7 +35,21 @@ Program ContableEmpresarialInternacional;
     Importe:real;
    end;
   T_ArchVentasHistorico=File of T_RegVentasHistorico;
-  T_Mes=1..12;    
+  T_Mes=1..12;  
+  tNumCliente=longint;
+  tNombre = string[maxLargoNombre];
+  tProvincia = string[maxLargoProvincia];
+  tLocalidad = string[maxLargoLocalidad];
+  tDireccion = string[maxLargoDireccion];
+  tRCliente = record
+                Num_Cliente:tNumCliente;
+                Nombre:tNombre;
+                Provincia:tProvincia;
+                Localidad:tLocalidad;
+				Direccion:tDireccion;
+              end;
+    tArClientes = file of tRCliente;
+    tArTotClientes = Text;  
  
  
   
@@ -46,17 +68,6 @@ Program ContableEmpresarialInternacional;
          Read(ArchVentasHistorico, RegVentasHistorico);
     End;
     
-   Function ConseguirMes(RegVentasArg:T_RegVentasArg):T_Mes;
-      Const
-       Posicion=5;
-       Cantidad=2;
-      Var
-       ST_Mes:string[2]; 
-	  Begin
-       ST_Mes:=Copy(RegVentasArg.Fecha, Posicion, Cantidad);
-       Val(ST_Mes, ConseguirMes);
-      End; 
-
  Procedure LecturaArchSucursal(Var ArchSucursal:T_ArchSucursal; Var RegSucursal:T_RegSucursal; Var FinSucursal:boolean);
    Begin
     FinSucursal:=EOF(ArchSucursal);
@@ -70,6 +81,33 @@ Program ContableEmpresarialInternacional;
     if (not FinVentas) then 
 		Read(ArchVentas, RegVentas)
    End;
+   
+   procedure LeerClientes(var arClientes:tArClientes; var rCliente:tRCliente; var finClientes:boolean);
+	begin
+		finClientes := EOF(arClientes);
+		if (not finClientes) then
+			read(arClientes, rCliente);
+	end;
+	
+	Function ConseguirMes(RegVentasArg:T_RegVentasArg):T_Mes;
+      Const
+       Posicion=5;
+       Cantidad=2;
+      Var
+       ST_Mes:string[2]; 
+	  Begin
+       ST_Mes:=Copy(RegVentasArg.Fecha, Posicion, Cantidad);
+       Val(ST_Mes, ConseguirMes);
+      End; 
+      
+    {Consigna 3: Indentacion (un extra)}
+		function PadRight(valor:string; anchoTotal:integer; relleno:char):string;
+		begin
+			PadRight := valor + StringOfChar(relleno, anchoTotal - Length(valor));
+		end;
+		
+	
+
 
  Procedure CuadroVentasArg2015(Var ArchVentasArg:T_ArchVentasArg; Var ArchSucArg:T_ArchSucursal);
  
@@ -163,7 +201,7 @@ Program ContableEmpresarialInternacional;
          begin   
            NroSuc:=RegVentasArg.Sucursal;
            MesPpal:=Mes;
-           VentasSucMes:=0;;
+           VentasSucMes:=0;
            while (not FinVentasArg) and (NroSuc=RegVentasArg.Sucursal) and (Mes=MesPpal) do
              begin
                VentasSucMes:=VentasSucMes+RegVentasArg.Importe;
@@ -229,6 +267,47 @@ Program ContableEmpresarialInternacional;
     Close(ArchVentasHistorico);
     Close(ArchVentasHistoricoActualizado);  
   End; {Local de ProcedureActualizarVentasHistorico}
+  
+  procedure TotalizarClientes(var arClientes:tArClientes; var arTotClientes:tArTotClientes);
+	var
+		auxProvincia:tProvincia;
+		auxLocalidad:tLocalidad;
+		finClientes:boolean;
+		rCliente:tRCliente;
+		totCantLoc,totCantProv,totCantGral:longint;
+	begin
+		reset(arClientes);
+		rewrite(arTotClientes);
+		totCantGral := 0;
+		LeerClientes(arClientes, rCliente, finClientes);
+		writeln(arTotClientes, 'Reporte General de Clientes');
+		while (not finClientes) do
+		begin
+			auxProvincia := rCliente.Provincia;
+			totCantProv:=0;
+			writeln(arTotClientes, '');
+			writeln(arTotClientes, 'Provincia: ', auxProvincia);
+			writeln(arTotClientes, PadRight('Localidad', maxLargoProvincia, ' '), 'Cantidad');
+			while (auxProvincia = rCliente.Provincia) and (not finClientes) do {al final agrego las condiciones anteriores}
+			begin
+				auxLocalidad := rCliente.Localidad;
+				totCantLoc := 0;
+				while (auxLocalidad = rCliente.Localidad) and (auxProvincia = rCliente.Provincia) and (not finClientes) do {al final agrego las condiciones anteriores}
+				begin
+					inc(totCantLoc);
+					LeerClientes(arClientes, rCliente, finClientes);
+				end;
+				writeln(arTotClientes, PadRight(auxLocalidad, maxLargoProvincia, '.'), totCantLoc);
+				totCantProv := totCantProv + totCantLoc;
+			end;
+			writeln(arTotClientes, 'Total Provincia: ', totCantProv);
+			totCantGral := totCantGral + totCantProv;
+		end;
+		writeln(arTotClientes, '');
+		writeln(arTotClientes, 'Total General de Clientes: ', totCantGral);
+		close(arTotClientes);
+		close(arClientes);
+	end;
 	
    	Procedure ActualizarSucMundo(var SucMundo:T_ArchSucursal;var SucNuevas:T_ArchSucursal);
 		Var
@@ -287,6 +366,10 @@ Program ContableEmpresarialInternacional;
    ArchSucArg:T_ArchSucursal;
    ArchVentasHistorico:T_ArchVentasHistorico;
    ArchVentasHistoricoActualizado:T_ArchVentasHistorico;
+   arClientes:tArClientes;
+   arTotClientes:tArTotClientes;
+   ArchSucMundo:T_ArchSucursal;
+   ArchSucNuevas:T_ArchSucursal;
    
    
  Begin {BloqPpal}
@@ -294,6 +377,12 @@ Program ContableEmpresarialInternacional;
     Assign(ArchSucArg, 'SucursalesArg.dat');
     Assign(ArchVentasHistorico, 'VentasHistorico.dat');
     Assign(ArchVentasHistoricoActualizado, 'VentasHistoricoActualizado.dat');
+    assign(arClientes, 'Clientes.dat');
+    assign(arTotClientes, 'TotCli.txt');
+    assign(ArchSucMundo, 'SucMundo.dat');
+    assign(ArchSucNuevas, 'SucNuevas.dat');
     CuadroVentasArg2015(ArchVentasArg, ArchSucArg);
     ActualizarVentasHistorico(ArchVentasArg, ArchVentasHistorico, ArchVentasHistoricoActualizado);
+    TotalizarClientes(arClientes, arTotClientes);
+    ActualizarSucMundo(ArchSucMundo,ArchSucNuevas);
  End. {BloqPpalProgram}
