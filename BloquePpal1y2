@@ -1,0 +1,23 @@
+{Bloque Ppal de Program Punto1 y Punto2}
+
+Var {BloqPpalProgram}
+   ArchVentasArg:T_ArchVentasArg;
+   ArchSucArg:T_ArchSucursal;
+   ArchVentasHistorico:T_ArchVentasHistorico;
+   ArchVentasHistoricoActualizado:T_ArchVentasHistorico;
+   
+   
+ Begin {BloqPpal}
+    Assign(ArchVentasArg, 'C:\Ventas.dat');
+    Assign(ArchSucArg, 'C:\SucursalesArg.dat');
+    Assign(ArchVentasHistorico, 'C:\VentasHistorico.dat');
+    Assign(ArchVentasHistoricoActualizado, 'C:\VentasHistoricoActualizado.dat');
+    
+    
+    
+    CuadroVentasArg2015(ArchVentasArg, ArchSucArg);
+    ActualizarVentasHistorico(ArchVentasArg, ArchVentasHistorico, ArchVentasHistoricoActualizado);
+    
+    
+    
+ End. {BloqPpalProgram}
