@@ -36,9 +36,7 @@ Program ContableEmpresarialInternacional;
     Begin{Local de Procedure LecturaArchVentasArg}
        FinVentasArg:=EOF(ArchVentasArg);
        if (not FinVentasArg) then
-        begin
          Read(ArchVentasArg, RegVentasArg)
-        end;
     End; {Local de Procedure LecturaArchVentasArg}  
     
     
@@ -121,10 +119,10 @@ Program ContableEmpresarialInternacional;
          writeln(RegSucArg.Nombre, StSpace, VentasSucMes[1], StSpace, VentasSucMes[2], StSpace, VentasSucMes[3], StSpace, VentasSucMes[4], StSpace, VentasSucMes[5], StSpace, VentasSucMes[6], StSpace, VentasSucMes[7], StSpace, VentasSucMes[8], StSpace, VentasSucMes[9], StSpace, VentasSucMes[10], StSpace, VentasSucMes[11], StSpace, VentasSucMes[12]);        
          LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);   
        end;
-   
+     
+     InicializarVentasSucMes(VentasSucMes);
      while (not FinSucArg) do
        begin
-         InicializarVentasSucMes(VentasSucMes);
          writeln(RegSucArg.Nombre, StSpace, VentasSucMes[1], StSpace, VentasSucMes[2], StSpace, VentasSucMes[3], StSpace, VentasSucMes[4], StSpace, VentasSucMes[5], StSpace, VentasSucMes[6], StSpace, VentasSucMes[7], StSpace, VentasSucMes[8], StSpace, VentasSucMes[9], StSpace, VentasSucMes[10], StSpace, VentasSucMes[11], StSpace, VentasSucMes[12]);        
          LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);   
        end; 
