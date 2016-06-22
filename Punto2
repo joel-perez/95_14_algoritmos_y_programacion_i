@@ -100,7 +100,7 @@ Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchV
                 end;
               ConversionH(RegVentasArgH, MesPpal, NroSuc, VentasMes);
            end; 
-        
+      end;  
      while (not FinVentasHistorico) do
        begin
         Writeln(ArchVentasHistoricoActualizado, RegVentasHistorico);
