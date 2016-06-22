@@ -17,6 +17,7 @@ Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchV
      FinVentasHistorico:boolean; 
      RegVentasArg:T_RegVentasArg;
      Mes:T_Mes;
+     MesPpal:T_Mes;
      NroSuc:word;
      VentasMes:real;
      
