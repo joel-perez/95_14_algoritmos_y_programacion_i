@@ -1,0 +1,332 @@
+Program TP2Punto1y2;
+
+Uses Crt, Sysutils;
+
+ Const
+    maxLargoNombre = 30;
+    maxLargoProvincia = 50;
+    maxLargoLocalidad = 50;
+    maxLargoDireccion = 50;
+    maxLargoPais = 50;
+    maxLargoTelefono = 20;
+
+ Type
+  T_RegVentasArg=Record
+    Fecha:string[8];
+    Num_Cliente:longword;
+    Sucursal:word;
+    Articulo:word;
+    Cantidad:word;
+    Importe:real;
+   end;
+  T_ArchVentasArg=File of T_RegVentasArg;
+  T_RegSucursal=Record
+    Num_Sucursal:word;
+    Nombre:string[maxLargoNombre];
+    Pais:string[maxLargoPais];
+    Direccion:string[maxLargoDireccion];
+    Telefono:string[maxLargoTelefono];
+   end;
+  T_ArchSucursal=File of T_RegSucursal;
+  T_RegVentasHst=Record
+    Anio:string[4];
+    Mes:string[2];
+    Num_Sucursal:word;
+    Importe:real;
+   end;
+  T_ArchVentasHistorico=File of T_RegVentasHst;
+  T_Mes=1..12;
+  
+  
+ Procedure LecturaArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasArg:T_RegVentasArg; Var FinVentasArg:boolean);
+    Begin
+       FinVentasArg:=EOF(ArchVentasArg);
+       if (not FinVentasArg) then
+         Read(ArchVentasArg, RegVentasArg);
+    End;
+
+
+ Procedure LecturaArchSucursal(Var ArchSucursal:T_ArchSucursal; Var RegSucursal:T_RegSucursal; Var FinSucursal:boolean);
+   Begin
+    FinSucursal:=EOF(ArchSucursal);
+    if (not FinSucursal) then
+		Read(ArchSucursal, RegSucursal);
+   End;
+
+
+ Function ConseguirMes(RegVentasArg:T_RegVentasArg):T_Mes;
+    Const
+     Posicion=5;
+     Cantidad=2;
+    Var
+     ST_Mes:string[2];
+	Begin
+     ST_Mes:=Copy(RegVentasArg.Fecha, Posicion, Cantidad);
+     Val(ST_Mes, ConseguirMes);
+    End;
+
+
+ Function PadRight(Valor:string; AnchoTotal:integer; Relleno:char):string;
+    Begin
+	  PadRight:=Valor+StringOfChar(Relleno, AnchoTotal-Length(Valor));
+    End;
+
+                                                 {Comienzo del Punto1}
+ Procedure CuadroVentasArg2015(Var ArchVentasArg:T_ArchVentasArg; Var ArchSucArg:T_ArchSucursal);
+
+   Const{Local del Procedure CuadroVentasArg2015}
+    Space=' ';
+
+   Type{Local del Procedure CuadroVentasArg2015}
+    T_Mes0=0..12;
+    T_VecVentasSucMes=Array [T_Mes] of real;
+    T_VecVentasMesString=Array [T_Mes] of string[5];
+    
+   Procedure InicializarVentasSucMes(Var VentasSucMes:T_VecVentasSucMes);
+     Var
+		j:T_Mes;
+     Begin
+		for j:=1 to 12 do
+		VentasSucMes[j]:=0;
+     End;
+
+   Function RecorteNombreSuc(Nombre:string):string;
+    Const
+     Posicion=1;
+     MaxNom=7;
+    Var
+     Aux:string[MaxNom]; 
+    Begin
+     Aux:=Copy(Nombre, Posicion, MaxNom);
+     RecorteNombreSuc:=PadRight(Aux, MaxNom, Space);
+    End;
+    
+   Procedure ConversionVentasString(Var VentasMesString:T_VecVentasMesString; VentasSucMes:T_VecVentasSucMes);
+    Const
+     MaxStVentas=5;
+    Var
+     j:T_Mes;
+     VentasMesInteger:longword;
+     StVentas:string[MaxStVentas];
+    Begin
+     for j:=1 to 12 do
+      begin
+       VentasMesInteger:=Round(VentasSucMes[j]);
+       Str(VentasMesInteger, StVentas);
+       VentasMesString[j]:=PadRight(StVentas, MaxStVentas, Space);
+      end;
+    End;       
+
+   Var{Local del Procedure CuadroVentasArg2015}
+     RegVentasArg:T_RegVentasArg;
+     RegSucArg:T_RegSucursal;
+     FinVentasArg:boolean;
+     FinSucArg:boolean;
+     Mes:T_Mes;
+     MesPpal:T_Mes0;
+     VentasSucMes:T_VecVentasSucMes;
+     VentasMesString:T_VecVentasMesString;
+     NomSuc:string[7];
+     Salida:char;
+
+   Begin{Local del Procedure CuadroVentasArg2015}
+     ClrScr;
+     Reset(ArchVentasArg);
+     Reset(ArchSucArg);
+     writeln('--------------------------------------------------------------------------------');
+     writeln('SucArg  Ene   Feb   Mar   Abr   May   Jun   Jul   Ago   Sep   Oct   Nov   Dic   ');
+     writeln('--------------------------------------------------------------------------------');
+     LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+     if (not FinVentasArg) then
+       Mes:=ConseguirMes(RegVentasArg);
+     LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);
+     while (not FinVentasArg) and (not FinSucArg) do
+      begin
+         MesPpal:=0;
+         InicializarVentasSucMes(VentasSucMes);
+         while (not FinVentasArg) and (not FinSucArg) and (RegVentasArg.Sucursal=RegSucArg.Num_Sucursal) do
+           begin
+             inc(MesPpal);
+             while (not FinVentasArg) and (not FinSucArg) and (RegVentasArg.Sucursal=RegSucArg.Num_Sucursal) and (Mes=MesPpal) do
+               begin
+                 VentasSucMes[MesPpal]:=VentasSucMes[MesPpal]+RegVentasArg.Importe;
+                 LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+                 Mes:=ConseguirMes(RegVentasArg);
+               end;
+           end; 
+         ConversionVentasString(VentasMesString, VentasSucMes);
+         NomSuc:=RecorteNombreSuc(RegSucArg.Nombre);
+         write(NomSuc, Space, VentasMesString[1], Space, VentasMesString[2], Space, VentasMesString[3], Space, VentasMesString[4], Space);
+         write(VentasMesString[5], Space, VentasMesString[6], Space, VentasMesString[7], Space, VentasMesString[8], Space);
+         writeln(VentasMesString[9], Space, VentasMesString[10], Space, VentasMesString[11], Space, VentasMesString[12]);
+         writeln('--------------------------------------------------------------------------------');
+         LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);
+      end;
+     InicializarVentasSucMes(VentasSucMes);
+     ConversionVentasString(VentasMesString, VentasSucMes);
+     while (not FinSucArg) do
+       begin
+         NomSuc:=RecorteNombreSuc(RegSucArg.Nombre);
+         write(NomSuc, Space, VentasMesString[1], Space, VentasMesString[2], Space, VentasMesString[3], Space, VentasMesString[4], Space);
+         write(VentasMesString[5], Space, VentasMesString[6], Space, VentasMesString[7], Space, VentasMesString[8], Space);
+         writeln(VentasMesString[9], Space, VentasMesString[10], Space, VentasMesString[11], Space, VentasMesString[12]);
+         writeln('--------------------------------------------------------------------------------');
+         LecturaArchSucursal(ArchSucArg, RegSucArg, FinSucArg);
+       end;
+     Close(ArchVentasArg);
+     Close(ArchSucArg);
+     repeat
+      writeln('Presione ESC en caso de finalizar la lectura del Cuadro de Ventas de las Sucursales Arg en 2015.');
+      Salida:=Readkey;
+      if (Salida=#27) then writeln('Muchas Gracias.');
+     until (Salida=#27);
+   End; {Local de Procedure CuadroVentasArg2015}
+                                                 {Fin del Punto1}
+ 
+ Procedure ActualizarVentasHistorico(Var ArchVentasArg:T_ArchVentasArg; Var ArchVentasHistorico, ArchVentasHistoricoActualizado:T_ArchVentasHistorico);
+  
+  Procedure LecturaArchVentasHistorico(Var ArchVentasHistorico:T_ArchVentasHistorico; Var RegVentasHistorico:T_RegVentasHst; Var FinVentasH:boolean);
+    Begin
+       FinVentasH:=EOF(ArchVentasHistorico);
+       if (not FinVentasH) then
+         Read(ArchVentasHistorico, RegVentasHistorico);
+    End;
+  
+   Procedure ConversionH(Var RegVentasArgH:T_RegVentasHst; MesPpal:T_Mes; NroSuc:word; VentasMes:real);
+       Const
+         Anio='2015';
+       Begin
+         RegVentasArgH.Anio:=Anio;
+         Str(MesPpal, RegVentasArgH.Mes);
+         RegVentasArgH.Num_Sucursal:=NroSuc;
+         RegVentasArgH.Importe:=VentasMes;
+       End;  
+  
+   Procedure ConseguirRegArgHst(Var ArVentas:T_ArchVentasArg;Var VtasArg:T_RegVentasArg;Var Fin:boolean;Var VtasArgH:T_RegVentasHst;Var M:T_Mes);
+     Var
+      MesPpal:T_Mes;
+      NroSuc:word;
+      VentasMes:real;
+     Begin
+       MesPpal:=M;
+       NroSuc:=VtasArg.Sucursal;
+       VentasMes:=0;
+       while (not Fin) and (NroSuc=VtasArg.Sucursal) and (M=MesPpal) do
+         begin
+           VentasMes:=VentasMes+VtasArg.Importe;
+           LecturaArchVentasArg(ArVentas, VtasArg, Fin);
+           M:=ConseguirMes(VtasArg);
+         end;
+       ConversionH(VtasArgH, MesPpal, NroSuc, VentasMes);
+     End;       
+          
+   Var{Local Procedure ActualizarVentasHistorico}
+     RegVentasArgH:T_RegVentasHst;
+     RegVentasHistorico:T_RegVentasHst;
+     FinVentasArg:boolean;
+     FinVentasHistorico:boolean; 
+     RegVentasArg:T_RegVentasArg;
+     Mes:T_Mes;
+     MesPpal:T_Mes;
+     NroSuc:word;
+     VentasMes:real;
+     AuxFinVentasArg:boolean;
+     
+  Begin{Local de ProcedureActualizarVentasHistorico}  
+   Reset(ArchVentasArg);
+   Reset(ArchVentasHistorico);
+   Rewrite(ArchVentasHistoricoActualizado);
+   LecturaArchVentasArg(ArchVentasArg, RegVentasArg, FinVentasArg);
+   if (not FinVentasArg) then 
+     begin 
+      Mes:=ConseguirMes(RegVentasArg);
+      ConseguirRegArgHst(ArchVentasArg, RegVentasArg, FinVentasArg, RegVentasArgH, Mes);
+      AuxFinVentasArg:=False;
+     end
+    else AuxFinVentasArg:=FinVentasArg;    
+   LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico); 
+   while (not AuxFinVentasArg) and (not FinVentasHistorico) do
+       if (RegVentasHistorico.Num_Sucursal<=RegVentasArgH.Num_Sucursal) then
+           begin
+             Write(ArchVentasHistoricoActualizado, RegVentasHistorico);
+             LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
+           end
+        else if (RegVentasArgH.Importe<>0) then
+                begin    
+                  Write(ArchVentasHistoricoActualizado, RegVentasArgH);
+                  if (not FinVentasArg) then
+                      begin 
+                        ConseguirRegArgHst(ArchVentasArg, RegVentasArg, FinVentasArg, RegVentasArgH, Mes);
+                        if (FinVentasArg) and (RegVentasArgH.Importe<>0) then 
+                            begin 
+                              while (not FinVentasHistorico) and (RegVentasHistorico.Num_Sucursal<=RegVentasArgH.Num_Sucursal) do
+                                 begin
+                                   Write(ArchVentasHistoricoActualizado, RegVentasHistorico);
+                                   LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
+                                 end;
+                              Write(ArchVentasHistoricoActualizado, RegVentasArgH);
+                              AuxFinVentasArg:=FinVentasArg;
+                            end
+                          else AuxFinVentasArg:=FinVentasArg;  
+                      end    
+                    else AuxFinVentasArg:=FinVentasArg;
+                end        
+              else begin
+                    if (not FinVentasArg) then
+                        begin 
+                          ConseguirRegArgHst(ArchVentasArg, RegVentasArg, FinVentasArg, RegVentasArgH, Mes);
+                          if (FinVentasArg) and (RegVentasArgH.Importe<>0) then 
+                              begin 
+                                 while (not FinVentasHistorico) and (RegVentasHistorico.Num_Sucursal<=RegVentasArgH.Num_Sucursal) do
+                                   begin
+                                     Write(ArchVentasHistoricoActualizado, RegVentasHistorico);
+                                     LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
+                                   end;
+                                 Write(ArchVentasHistoricoActualizado, RegVentasArgH);
+                                 AuxFinVentasArg:=FinVentasArg;
+                              end
+                            else AuxFinVentasArg:=FinVentasArg; 
+                        end    
+                      else AuxFinVentasArg:=FinVentasArg;
+                   end;                 
+   while (not AuxFinVentasArg) do
+      begin
+        Write(ArchVentasHistoricoActualizado, RegVentasArgH);
+        if (not FinVentasArg) then
+            begin
+              ConseguirRegArgHst(ArchVentasArg, RegVentasArg, FinVentasArg, RegVentasArgH, Mes); 
+              if (FinVentasArg) and (RegVentasArgH.Importe<>0) then 
+                  begin 
+                    Write(ArchVentasHistoricoActualizado, RegVentasArgH);
+                    AuxFinVentasArg:=FinVentasArg;
+                  end
+                else AuxFinVentasArg:=FinVentasArg;     
+            end
+          else AuxFinVentasArg:=FinVentasArg;
+      end;       
+   while (not FinVentasHistorico) do
+       begin
+        Write(ArchVentasHistoricoActualizado, RegVentasHistorico);
+        LecturaArchVentasHistorico(ArchVentasHistorico, RegVentasHistorico, FinVentasHistorico);
+       end;        
+   Close(ArchVentasArg);
+   Close(ArchVentasHistorico);
+   Close(ArchVentasHistoricoActualizado);  
+  End;{Local de Procedure ActualizarVentasHistorico} 
+                                                 {Fin del Punto2}                                              
+
+ Var{BloquePpal}
+  ArchVentasArg:T_ArchVentasArg;
+  ArchSucArg:T_ArchSucursal;
+  ArchVentasHistorico:T_ArchVentasHistorico;
+  ArchVentasHistoricoActualizado:T_ArchVentasHistorico;
+  
+ Begin{BloquePpal}
+  Assign(ArchVentasArg, 'Ventas.dat');
+  Assign(ArchSucArg, 'SucursalesArg.dat');
+  Assign(ArchVentasHistorico, 'VentasHistorico.dat');
+  Assign(ArchVentasHistoricoActualizado, 'VentasHistoricoActualizado.dat');
+  CuadroVentasArg2015(ArchVentasArg, ArchSucArg);
+  ActualizarVentasHistorico(ArchVentasArg, ArchVentasHistorico, ArchVentasHistoricoActualizado);
+ End.{BloquePpal}                                               
+                                                 
