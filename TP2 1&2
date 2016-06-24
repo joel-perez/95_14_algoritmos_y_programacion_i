@@ -72,6 +72,9 @@ Uses Crt, Sysutils;
     End;
 
                                                  {Comienzo del Punto1}
+        {OBSERVACIONES: Procedure CuadroVentasArg2015 informa al usuario las ventas realizadas en cada una de las sucursales en el 2015, 
+         siempre y cuando la venta final mensual no exceda los $99999 con el fin de conseguir claridad a la hora de informar, 
+         debido a las limitaciones de la pantalla de ejecucion...} 
  Procedure CuadroVentasArg2015(Var ArchVentasArg:T_ArchVentasArg; Var ArchSucArg:T_ArchSucursal);
 
    Const{Local del Procedure CuadroVentasArg2015}
