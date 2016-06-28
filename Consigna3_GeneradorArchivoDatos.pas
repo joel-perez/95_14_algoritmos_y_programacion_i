@@ -79,6 +79,6 @@ var
 
 {Procedimiento Principal}
 begin
-    assign(arClientes, 'C:\95_14_algoritmos_y_programacion_i\Clientes.dat');
+    assign(arClientes, 'Clientes.dat');
     GenerarArchivoClientes(arClientes);
 end.

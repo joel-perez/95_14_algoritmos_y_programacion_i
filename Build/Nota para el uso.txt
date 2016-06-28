@@ -1,3 +1,4 @@
 Debe copiar los ejecutables de el cd al disco, al existir el control de cuentas de usuario en windows superiores a xp desconocemos si el programa
 tiene permiso a guardar sus archivos en el C:, tampoco encontramos practico para el evaluador guardarlo en el %TEMP%, por lo que los archivos se guardan
 en la misma carpeta del programa.
+Se proveen con el programa unos archivos ya cargados con mas de 20 registros, sin haber sido procesador por el programa principal.

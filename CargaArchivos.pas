@@ -193,6 +193,7 @@ begin
 			Writeln('Cantidad:',Reg.Cantidad);
 			Writeln('Importe:',Reg.Importe);
 			Writeln(' ');
+			readkey;
 		end;
 	close(Ventas);
 end;
@@ -213,6 +214,7 @@ begin
 			Writeln('Codigo Sucursal: ',Reg.Num_Sucursal);
 			Writeln('Importe: ',Reg.Importe);
 			Writeln(' ');
+			readkey;
 		end;
 	close(VentasHistorico);
 End;
@@ -234,6 +236,7 @@ begin
 			Writeln('Direccion; ',Reg.Direccion);
 			Writeln('Telefono: ',Reg.Tel);
 			Writeln(' ');
+			readkey;
 		end;
 	close(sucursales);
 end;
