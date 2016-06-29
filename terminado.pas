@@ -388,23 +388,16 @@ Procedure LecturaArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasA
 	
    	Procedure ActualizarSucMundo(var SucMundo:T_ArchSucursal;var SucNuevas:T_ArchSucursal);
 		Var
-			SucMundoNuevo:T_ArchSucursal;
 			RegMundo, RegNuevas:T_RegSucursal;
 			FinMundo,FinNuevas:Boolean;
-			err:boolean;
+			SucMundoNuevo:T_ArchSucursal;
 		Begin
-			err:=false;
-			writeln('Todo bien por ahora');
-			Rename(SucMundo, Concat('SucMundo',DateTimeToStr(Now),'.BAK'));
-			writeln('Todo bien por ahora');
 			Reset(SucMundo);
 			Reset(SucNuevas);
-			writeln('Todo bien por ahora');
-			Assign(SucMundoNuevo,'SucursalesMundo.dat');
+			Assign(SucMundoNuevo, 'SucursalesMundoActualizado.dat');
 			Rewrite(SucMundoNuevo);
 			LecturaArchSucursal(SucMundo,RegMundo,FinMundo);
 			LecturaArchSucursal(SucNuevas,RegNuevas,FinNuevas);
-			writeln('Todo bien por ahora');
 			While NOT (FinMundo OR FinNuevas) do
 				If RegNuevas.Num_Sucursal < RegMundo.Num_Sucursal then
 					Begin
@@ -418,7 +411,6 @@ Procedure LecturaArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasA
 					End
 				Else
 					Begin
-						err:=true;
 						Write(SucMundoNuevo, RegNuevas);
 						LecturaArchSucursal(SucNuevas,RegNuevas,FinNuevas);
 						LecturaArchSucursal(SucMundo,RegMundo,FinMundo);
@@ -436,8 +428,6 @@ Procedure LecturaArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasA
 			close(SucMundoNuevo);
 			close(SucNuevas);
 			close(SucMundo);
-			If NOT err then
-				Erase(SucMundo); //si por alguna razon habia dos iguales y por defecto se conservo el nuevo, no se borra el BAK
 			SucMundo:=SucMundoNuevo;
 		End;
 
@@ -454,13 +444,12 @@ Procedure LecturaArchVentasArg(Var ArchVentasArg:T_ArchVentasArg; Var RegVentasA
    
  Begin {BloqPpal}
     Assign(ArchVentasArg, 'Ventas.dat');
-    Assign(ArchSucArg, 'SucursalesArg.dat');
     Assign(ArchVentasHistorico, 'VentasHistorico.dat');
     Assign(ArchVentasHistoricoActualizado, 'VentasHistoricoActualizado.dat');
     assign(arClientes, 'Clientes.dat');
     assign(arTotClientes, 'TotCli.txt');
-    assign(ArchSucMundo, 'SucursalesMundo.dat');
     assign(ArchSucArg, 'SucursalesArg.dat');
+    Assign(ArchSucMundo,'SucursalesMundo.dat');
     CuadroVentasArg2015(ArchVentasArg, ArchSucArg);
     ActualizarVentasHistorico(ArchVentasArg, ArchVentasHistorico, ArchVentasHistoricoActualizado);
     TotalizarClientes(arClientes, arTotClientes);
